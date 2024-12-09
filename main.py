@@ -7,12 +7,28 @@ import os
 import time
 import pickle
 from PyPDF2 import PdfReader
+import secrets
 
 # Initialize FastAPI app
 app = FastAPI()
 
 # Initialize Mistral client
-api_key = "3TdKEjpWomNBvZUC5CH6M8Jr8qSHIncJ"
+def load_secrets(file_path):
+    secrets = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            key, value = line.strip().split('=', 1)
+            secrets[key] = value
+    return secrets
+
+# Path to the secrets.txt file
+secrets_file_path = 'secrets.txt'
+
+# Load the secrets
+secrets = load_secrets(secrets_file_path)
+
+# Access the API_KEY
+api_key = secrets.get('API_KEY')
 client = Mistral(api_key=api_key)
 
 # Define the request model
@@ -86,13 +102,13 @@ def run_mistral(user_message, conversation_history, model="mistral-large-latest"
 def load_or_generate_embeddings(theme):
     embeddings_file = f'{theme}_embeddings.pkl'
     chunks_file = f'{theme}_chunks.pkl'
-    if os.path.exists(embeddings_file) and os.path.exists(chunks_file):
-        with open(embeddings_file, 'rb') as f:
+    if os.path.exists(f'./embeddings/{embeddings_file}') and os.path.exists(f'./chunks/{chunks_file}'):
+        with open(f'embeddings/{embeddings_file}', 'rb') as f:
             text_embeddings = pickle.load(f)
-        with open(chunks_file, 'rb') as f:
+        with open(f'chunks/{chunks_file}', 'rb') as f:
             chunks = pickle.load(f)
     else:
-        text = extract_text_from_pdfs(".")
+        text = extract_text_from_pdfs("./pdfs/")
         chunk_size = 2048
         chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
         max_batch_size = 16080
@@ -108,9 +124,9 @@ def load_or_generate_embeddings(theme):
         elapsed_time = end_time - start_time
         print(f"Time taken to generate text_embeddings for {theme}: {elapsed_time} seconds")
 
-        with open(embeddings_file, 'wb') as f:
+        with open(f'embeddings/{embeddings_file}', 'wb') as f:
             pickle.dump(text_embeddings, f)
-        with open(chunks_file, 'wb') as f:
+        with open(f'chunks/{chunks_file}', 'wb') as f:
             pickle.dump(chunks, f)
 
     d = text_embeddings.shape[1]

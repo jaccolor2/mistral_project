@@ -3,7 +3,7 @@ from django.http import JsonResponse
 import requests
 import logging
 from urllib.parse import quote
-
+import markdown
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -15,18 +15,20 @@ def chatbot_view(request):
         user_input = quote(str(request.POST.get('userInput')))
 
         try:
-            url = f'http://127.0.0.1:8000/chat/'
+            url = 'http://127.0.0.1:8000/chat/'
             headers = {
                 'Content-Type': 'application/json'
             }
             json = {
-                'theme':theme,
-                'user_input':user_input
+                'theme': theme,
+                'user_input': user_input
             }
             response = requests.post(url, json=json, headers=headers)
             response.raise_for_status()  # Raise an exception for HTTP errors
             data = response.json()
-            return render(request, 'index.html', {'response': data.get('response')})
+            markdown_content = data.get('response', '')
+            html_content = markdown.markdown(markdown_content)
+            return render(request, 'index.html', {'response': html_content})
         except requests.exceptions.RequestException as e:
             logger.error(f"Request failed: {e}")
             return render(request, 'index.html', {'response': 'Error: Failed to connect to the API.'})

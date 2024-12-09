@@ -67,7 +67,7 @@
             <button class="button" type="submit">Send</button>
         </form>
         {% if response %}
-            <div class="response">{{ response }}</div>
+            <div class="response">{{ response|safe }}</div>
         {% endif %}
     </div>
 </body>
