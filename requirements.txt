@@ -1,22 +1,22 @@
 # FastAPI and related dependencies
-fastapi==0.104.1
-uvicorn==0.24.0.post1
-pydantic==2.5.2
+fastapi
+uvicorn
+pydantic
 
 # Mistral AI client (assuming it's a custom package, replace with the actual package name if different)
-mistralai==1.0.0
+mistralai
 
 # FAISS for similarity search
-faiss-cpu==1.7.3
+faiss-cpu
 
 # PyPDF2 for PDF text extraction
-PyPDF2==3.0.1
+PyPDF2
 
 # Django and related dependencies
-Django==5.1.4
+Django
 
 # Requests for making HTTP requests
-requests==2.31.0
+requests
 
 # Logging
-logging==0.5.1.2
+logging
